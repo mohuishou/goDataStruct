@@ -96,5 +96,4 @@ func compare(s *Node, e string) (result string) {
 
 	}
 	return result
-
 }
