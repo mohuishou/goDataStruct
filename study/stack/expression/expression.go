@@ -1,13 +1,8 @@
-//中缀表达式转后缀表达式
-
-package main
+package expression
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
-
-	stack "github.com/mohuishou/goDataStruct/study/stack/example/stack"
 )
 
 //符号优先级别：
@@ -24,18 +19,11 @@ var order = map[string]int{
 	")": 9,
 }
 
-func main() {
-	// var e string
-	// fmt.Print("请输入一个表达式：")
-	// fmt.Scanln(&e)
-	// test(e)
-	test("(2*(9+6/3-5)+4)")
-}
+//Infix2Postfix 中缀表达式转后缀表达式
+//返回格式化成功的表达式
+func Infix2Postfix(e string) (result string) {
 
-func test(e string) {
-	var result string
-
-	s := stack.NewStack()
+	s := NewStack()
 	expression := strings.Split(e, "")
 	for i := range expression {
 		if strings.TrimSpace(expression[i]) == "" {
@@ -49,6 +37,7 @@ func test(e string) {
 			continue
 		}
 
+		//优先级比较
 		result = result + compare(s, expression[i])
 
 	}
@@ -58,11 +47,11 @@ func test(e string) {
 		elem, _ := s.Pop()
 		result = result + elem.Expression
 	}
-
-	fmt.Println(result)
+	return result
 }
 
-func compare(s *stack.Node, e string) (result string) {
+//compare 优先级比较
+func compare(s *Node, e string) (result string) {
 	//优先级判断
 	lv := order[e]
 	//如果堆栈为空或者是优先级较高则进行下面的操作
@@ -89,20 +78,22 @@ func compare(s *stack.Node, e string) (result string) {
 		}
 
 		//运算符入栈
-		s.Push(stack.Element{Expression: e, Lv: lv})
+		s.Push(Element{Expression: e, Lv: lv})
 
 	} else if lv <= s.Next.Data.Lv {
-		//当优先级小于等于栈顶运算符优先级时，弹出栈顶运算符，并把新运算符入栈
+		//当优先级小于等于栈顶运算符优先级时，弹出栈顶运算符
 		elem, _ := s.Pop()
 		result = result + elem.Expression
 
+		//如果此时栈空或者优先级较高，将运算符入栈并且返回结果
 		if s.IsEmpty() == true || lv > s.Next.Data.Lv {
+			s.Push(Element{Expression: e, Lv: lv})
 			return result
 		}
 
+		//优先级不比栈顶优先级高时，需要继续比较
 		result = result + compare(s, e)
 
-		// s.Push(stack.Element{Expression: e, Lv: lv})
 	}
 	return result
 
