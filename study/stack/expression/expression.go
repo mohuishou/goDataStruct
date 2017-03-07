@@ -25,8 +25,10 @@ func Infix2Postfix(e string) (result string) {
 
 	s := NewStack()
 	expression := strings.Split(e, "")
-	//标记位，标记两个数字之间是否有运算符间隔，没有运算符间隔则为一个连续的整数
+	//标记位，tag>0标记两个数字之间是否有运算符间隔，没有运算符间隔则为一个连续的整数
+	//tag<0标记是否存在两个除括号外的连续的运算符
 	tag := 0
+
 	for i := range expression {
 		if strings.TrimSpace(expression[i]) == "" {
 			continue
@@ -35,6 +37,9 @@ func Infix2Postfix(e string) (result string) {
 		//判断是否是数字
 		_, err := strconv.Atoi(expression[i])
 		if err == nil {
+			if tag < 0 {
+				tag = 0
+			}
 			if tag == 0 {
 				result = result + " "
 			}
@@ -42,10 +47,31 @@ func Infix2Postfix(e string) (result string) {
 			tag++
 			continue
 		}
-		tag = 0
+		if tag > 0 {
+			tag = 0
+		}
+
+		//第一个字符必须是数字或者是负号，其他的不行
+		if i == 0 && expression[i] != "-" {
+			panic("您输入的表达式有误！")
+		}
+
+		//最后一个字符必须为数字
+		if i == len(expression)-1 {
+			panic("您输入的表达式有误！")
+		}
+
+		//中缀表达式不允许两个运算符相邻（括号除外）
+		if tag < -1 {
+			panic("您输入的表达式有误！")
+		}
+
+		if expression[i] != "(" && expression[i] != ")" {
+			tag--
+		}
 
 		//优先级比较
-		result = result + compare(s, expression[i])
+		result = result + " " + compare(s, expression[i])
 
 	}
 
