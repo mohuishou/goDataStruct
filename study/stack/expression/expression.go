@@ -20,11 +20,13 @@ var order = map[string]int{
 }
 
 //Infix2Postfix 中缀表达式转后缀表达式
-//返回格式化成功的表达式
+//返回格式化成功的表达式，以空格间隔
 func Infix2Postfix(e string) (result string) {
 
 	s := NewStack()
 	expression := strings.Split(e, "")
+	//标记位，标记两个数字之间是否有运算符间隔，没有运算符间隔则为一个连续的整数
+	tag := 0
 	for i := range expression {
 		if strings.TrimSpace(expression[i]) == "" {
 			continue
@@ -33,9 +35,14 @@ func Infix2Postfix(e string) (result string) {
 		//判断是否是数字
 		_, err := strconv.Atoi(expression[i])
 		if err == nil {
+			if tag == 0 {
+				result = result + " "
+			}
 			result = result + expression[i]
+			tag++
 			continue
 		}
+		tag = 0
 
 		//优先级比较
 		result = result + compare(s, expression[i])
@@ -45,7 +52,7 @@ func Infix2Postfix(e string) (result string) {
 	//循环结束，检查堆栈内是否还有运算符，有的话依次抛出
 	for s.IsEmpty() == false {
 		elem, _ := s.Pop()
-		result = result + elem.Expression
+		result = result + " " + elem.Expression
 	}
 	return result
 }
