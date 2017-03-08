@@ -132,6 +132,7 @@ func (n *Node) remove(exp int) {
 //FindExp 根据指数查找值
 func (n Node) FindExp(exp int) *Node {
 	p := &n
+	p = p.next
 	for p != nil && p.exp != exp {
 		p = p.next
 	}
